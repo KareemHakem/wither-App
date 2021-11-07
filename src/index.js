@@ -1,17 +1,31 @@
-import React from 'react';
-import ReactDOM from 'react-dom';
-import './index.css';
-import App from './App';
-import reportWebVitals from './reportWebVitals';
+import React from "react";
+import ReactDom from "react-dom";
+import Loader from './Loader';
+import SeasonDisplay from './SeasonDisplay'
 
-ReactDOM.render(
-  <React.StrictMode>
-    <App />
-  </React.StrictMode>,
-  document.getElementById('root')
-);
+class App extends React.Component {
+    
+    state = { lat: null, errMassage: "" };
+ 
+  componentDidMount() {
+    window.navigator.geolocation.getCurrentPosition(
+      position => this.setState({ let: position.coords.latitude }),    
+      err =>  this.setState({ errMassage: err.message })
+    );
+  }
 
-// If you want to start measuring performance in your app, pass a function
-// to log results (for example: reportWebVitals(console.log))
-// or send to an analytics endpoint. Learn more: https://bit.ly/CRA-vitals
-reportWebVitals();
+  // react says we have to define render
+  render() {
+    if (this.state.errMassage && !this.state.lat) {
+      return <div>error: {this.state.errMassage} </div>;
+    }
+
+    if (!this.state.errMassage && this.state.let) {
+      return <SeasonDisplay lat = {this.state.let} />
+    }
+
+    return <Loader />;
+  }
+}
+
+ReactDom.render(<App />, document.querySelector("#root"));
